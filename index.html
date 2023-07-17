@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Responder - Quick replies</title>
+  <link rel="icon" type="image/x-icon" href="icon.png">
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+      width: 400px;
+    }
+
+    .input-container {
+      display: flex;
+    }
+
+    #message {
+      flex: 1;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px 0 0 5px;
+    }
+
+    #addButton {
+	font-weight: bold;
+      padding: 5px 10px;
+      border: none;
+      background-color: #3A8EFF;
+      color: #fff;
+      border-radius: 0 5px 5px 0;
+      cursor: pointer;
+    }
+
+    #addButton:hover {
+      background-color: #75AFFF;
+    }
+
+    ul {
+      padding: 0;
+    }
+
+    li {
+      list-style-type: none;
+      margin-bottom: 19px;
+      word-wrap: break-word;
+	cursor: pointer;
+    }
+
+    .circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid #ccc;
+      display: inline-block;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .circle.checked {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+	<center><h1><img src="logo.png" alt="Responder"><br><img src="sideicon.png" width="70" height="75"></h1></center>
+    <div class="input-container">
+      <input type="text" id="message" placeholder="Enter message..." maxlength="100">
+      <button id="addButton">Add</button>
+    </div>
+    <ul id="messageList"></ul>
+
+
+<footer>
+<br>
+<br>
+<center><p>Responder &copy; 2023</p></center>
+</footer>
+
+
+  </div>
+
+  <script>
+    const messageInput = document.getElementById("message");
+    const addButton = document.getElementById("addButton");
+    const messageList = document.getElementById("messageList");
+
+    const preCodedSentences = [
+      "Hey, what's up? How's it going?",
+	"Hey, wanna hang out later?",
+	"What's wrong? Wanna talk about it?",
+	"What are you up to today? Anything planned?",
+      "Good morning, how are you doing today?",
+      "Good afternoon, how are you doing today?",
+	"Good evening, how are you doing today?",
+      "Good night, I'll talk to you later",
+      "That's awesome, I wish you luck on it!",
+	"That's cool, I hope it goes well for you!",
+	"That's a good idea!",
+	"I hope you have a good day today!",
+	"I understand, hope you get better soon.",
+	"I'm good, thank you, how are you?",
+	"I'm busy at the moment. I'll talk to you later",
+      "I'm at work currently, I'll let you know when I'm off",
+	"I'm at the movies, I'll talk to you soon!",
+	"I'm running a bit late, but I'm on my way",
+	"I need some time to myself right now.",
+	"I'm pretty good, thank you!",
+	"I'm doing fantastic! Thank you!",
+	"I'm not doing too good today honestly.",
+	"Just a heads up, my battery is low!"
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const messages = JSON.parse(localStorage.getItem("messages")) || [];
+      messages.forEach((message) => renderMessage(message));
+      preCodedSentences.forEach((sentence) => renderMessage(sentence));
+    });
+
+    addButton.addEventListener("click", () => {
+      const message = messageInput.value.trim();
+      if (message !== "") {
+        saveMessage(message);
+        renderMessage(message);
+        messageInput.value = "";
+      }
+    });
+
+    function saveMessage(message) {
+      const messages = JSON.parse(localStorage.getItem("messages")) || [];
+      messages.push(message);
+      localStorage.setItem("messages", JSON.stringify(messages));
+    }
+
+    function renderMessage(message) {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <span class="circle"></span>
+        <span>${message}</span>
+      `;
+      messageList.appendChild(li);
+
+
+      li.addEventListener("click", (event) => {
+        if (event.target.classList.contains("circle")) {
+          copyToClipboard(message);
+        } else {
+          deleteMessage(li, message);
+        }
+      });
+    }
+
+    function deleteMessage(li, message) {
+      messageList.removeChild(li);
+      const messages = JSON.parse(localStorage.getItem("messages")) || [];
+      const index = messages.indexOf(message);
+      if (index !== -1) {
+        messages.splice(index, 1);
+        localStorage.setItem("messages", JSON.stringify(messages));
+      }
+    }
+
+    function copyToClipboard(text) {
+      const tempTextarea = document.createElement("textarea");
+      tempTextarea.value = text;
+      document.body.appendChild(tempTextarea);
+      tempTextarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempTextarea);
+    }
+  </script>
+</body>
+</html>
